@@ -1,4 +1,4 @@
 #!/bin/sh
 
-ln -sf "$(pwd)/configs/*" "$HOME/.config/"
+find "$(pwd)/configs" -mindepth 1 -maxdepth 1 -exec ln -sf {} "$HOME/.config/" \;
 
