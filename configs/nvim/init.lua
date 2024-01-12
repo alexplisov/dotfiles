@@ -1,4 +1,170 @@
-vim.cmd[[set shiftwidth=4]]
-vim.cmd[[set nu]]
-vim.cmd[[colorscheme lunaperche]]
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+if not vim.loop.fs_stat(lazypath) then
+	vim.fn.system({
+		'git',
+		'clone',
+		'--filter=blob:none',
+		'https://github.com/folke/lazy.nvim.git',
+		'--branch=stable',
+		lazypath,
+	})
+end
+vim.opt.rtp:prepend(lazypath)
+
+local plugins = {
+	-- colorschemes
+	--{ 'catppuccin/nvim' },
+	{ 'ellisonleao/gruvbox.nvim' },
+	--{ 'EdenEast/nightfox.nvim' },
+	--{ 'rose-pine/neovim' },
+	--{ 'rebelot/kanagawa.nvim' },
+	{ 'nvim-lualine/lualine.nvim' },
+	{ 'nvim-telescope/telescope.nvim',    branch = '0.1.x',   dependencies = { 'nvim-lua/plenary.nvim' } },
+	{ 'nvim-treesitter/nvim-treesitter',  build = ':TSUpdate' },
+	-- LSP
+	{ 'neovim/nvim-lspconfig' },
+	{ 'williamboman/mason.nvim' },
+	{ 'williamboman/mason-lspconfig.nvim' },
+	-- completions
+	{ 'hrsh7th/nvim-cmp' },
+	{ 'hrsh7th/cmp-nvim-lsp' },
+	{ 'L3MON4D3/LuaSnip',                 version = 'v2.*',   build = "make install_jsregexp" },
+	-- debugging
+	-- misc
+	{ 'm4xshen/autoclose.nvim' },
+	{ 'nvim-tree/nvim-tree.lua' },
+	{ 'nvim-tree/nvim-web-devicons' },
+	{
+		"christoomey/vim-tmux-navigator",
+		cmd = {
+			"TmuxNavigateLeft",
+			"TmuxNavigateDown",
+			"TmuxNavigateUp",
+			"TmuxNavigateRight",
+			"TmuxNavigatePrevious",
+		},
+		keys = {
+
+			{ "<c-h>",  "<cmd><C-U>TmuxNavigateLeft<cr>" },
+			{ "<c-j>",  "<cmd><C-U>TmuxNavigateDown<cr>" },
+
+			{ "<c-k>",  "<cmd><C-U>TmuxNavigateUp<cr>" },
+			{ "<c-l>",  "<cmd><C-U>TmuxNavigateRight<cr>" },
+			{ "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" }
+		}
+	}
+}
+
+local opts = {
+}
+
+require('lazy').setup(plugins, opts)
+
+local builtin = require('telescope.builtin')
+
+require('telescope').setup()
+require('lualine').setup({
+	options = {
+		globalstatus = true
+	},
+})
+require('nvim-tree').setup()
+require('mason').setup()
+require('mason-lspconfig').setup()
+require('autoclose').setup()
+
+local cmp = require('cmp')
+
+cmp.setup {
+	snippet = {
+		expand = function(args)
+			require('luasnip').lsp_expand(args.body)
+		end
+	},
+	window = {
+		completion = cmp.config.window.bordered(),
+		documentation = cmp.config.window.bordered(),
+	},
+	mapping = cmp.mapping.preset.insert {
+		['<C-b>'] = cmp.mapping.scroll_docs(-4),
+		['<C-f>'] = cmp.mapping.scroll_docs(4),
+		['<C-space>'] = cmp.mapping.complete(),
+		['<C-e>'] = cmp.mapping.abort(),
+		['<CR>'] = cmp.mapping.confirm { select = true }
+	},
+	sources = cmp.config.sources {
+		{ name = 'nvim_lsp' },
+		{ name = 'luasnip' },
+		{ name = 'buffer' }
+	}
+}
+
+local lspconfig = require('lspconfig')
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+require('mason-lspconfig').setup_handlers {
+	function(server_name)
+		lspconfig[server_name].setup {
+			capabilities = capabilities
+		}
+	end,
+	['lua_ls'] = function()
+		lspconfig.lua_ls.setup {
+			settings = {
+				Lua = {
+					diagnostics = {
+						globals = { 'vim' }
+					}
+				}
+			}
+		}
+	end
+}
+
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.g.mapleader = ' '
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.cmd.colorscheme 'gruvbox'
+vim.wo.nu = true
+vim.wo.rnu = true
+vim.wo.wrap = false
+vim.o.fillchars = vim.o.fillchars .. "eob: "
+
+vim.keymap.set('n', '<Leader>sf', builtin.find_files, {})
+vim.keymap.set('n', '<Leader>b', ':NvimTreeToggle<CR>')
+vim.keymap.set('n', '<Leader>f', function()
+	vim.lsp.buf.format { async = true }
+end)
+
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+  callback = function(ev)
+    -- Enable completion triggered by <c-x><c-o>
+    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+
+    -- Buffer local mappings.
+    -- See `:help vim.lsp.*` for documentation on any of the below functions
+    opts = { buffer = ev.buf }
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+    vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
+    vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
+    vim.keymap.set('n', '<space>wl', function()
+      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+    end, opts)
+    vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
+    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
+    vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, opts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+    vim.keymap.set('n', '<space>f', function()
+      vim.lsp.buf.format { async = true }
+    end, opts)
+  end,
+})
+
 
