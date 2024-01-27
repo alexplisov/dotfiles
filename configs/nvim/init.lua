@@ -19,8 +19,12 @@ local plugins = {
 	--{ 'rose-pine/neovim' },
 	--{ 'rebelot/kanagawa.nvim' },
 	{ 'nvim-lualine/lualine.nvim' },
-	{ 'nvim-telescope/telescope.nvim',    branch = '0.1.x',   dependencies = { 'nvim-lua/plenary.nvim' } },
-	{ 'nvim-treesitter/nvim-treesitter',  build = ':TSUpdate' },
+	-- Telescope
+	{ 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
+	{
+		"nvim-telescope/telescope-file-browser.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+	},
 	-- LSP
 	{ 'neovim/nvim-lspconfig' },
 	{ 'williamboman/mason.nvim' },
@@ -28,30 +32,23 @@ local plugins = {
 	-- completions
 	{ 'hrsh7th/nvim-cmp' },
 	{ 'hrsh7th/cmp-nvim-lsp' },
-	{ 'L3MON4D3/LuaSnip',                 version = 'v2.*',   build = "make install_jsregexp" },
+	{ 'hrsh7th/cmp-nvim-lsp-signature-help' },
+	{ 'L3MON4D3/LuaSnip',                   version = 'v2.*',   build = "make install_jsregexp" },
 	-- debugging
 	-- misc
+	{ 'nvim-treesitter/nvim-treesitter',    build = ':TSUpdate' },
 	{ 'm4xshen/autoclose.nvim' },
 	{ 'nvim-tree/nvim-tree.lua' },
 	{ 'nvim-tree/nvim-web-devicons' },
 	{
-		"christoomey/vim-tmux-navigator",
-		cmd = {
-			"TmuxNavigateLeft",
-			"TmuxNavigateDown",
-			"TmuxNavigateUp",
-			"TmuxNavigateRight",
-			"TmuxNavigatePrevious",
-		},
-		keys = {
-
-			{ "<c-h>",  "<cmd><C-U>TmuxNavigateLeft<cr>" },
-			{ "<c-j>",  "<cmd><C-U>TmuxNavigateDown<cr>" },
-
-			{ "<c-k>",  "<cmd><C-U>TmuxNavigateUp<cr>" },
-			{ "<c-l>",  "<cmd><C-U>TmuxNavigateRight<cr>" },
-			{ "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" }
-		}
+		'nvimdev/dashboard-nvim',
+		event = 'VimEnter',
+		config = function()
+			require('dashboard').setup {
+				-- config
+			}
+		end,
+		dependencies = { { 'nvim-tree/nvim-web-devicons' } }
 	}
 }
 
@@ -62,13 +59,31 @@ require('lazy').setup(plugins, opts)
 
 local builtin = require('telescope.builtin')
 
-require('telescope').setup()
-require('lualine').setup({
+local telescope = require('telescope')
+
+telescope.setup {
+	pickers = {
+		find_files = {
+			previewer = false,
+			theme = 'dropdown'
+		},
+	},
+	extensions = {
+		file_browser = {
+			theme = 'dropdown',
+			previewer = false,
+			hijack_netrw = true,
+		}
+	}
+}
+telescope.load_extension 'file_browser'
+
+require('lualine').setup {
 	options = {
 		globalstatus = true
 	},
-})
-require('nvim-tree').setup()
+}
+--require('nvim-tree').setup()
 require('mason').setup()
 require('mason-lspconfig').setup()
 require('autoclose').setup()
@@ -95,6 +110,7 @@ cmp.setup {
 	sources = cmp.config.sources {
 		{ name = 'nvim_lsp' },
 		{ name = 'luasnip' },
+		{ name = 'nvim_lsp_signature_help' },
 		{ name = 'buffer' }
 	}
 }
@@ -105,7 +121,7 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 require('mason-lspconfig').setup_handlers {
 	function(server_name)
 		lspconfig[server_name].setup {
-			capabilities = capabilities
+			capabilities = capabilities,
 		}
 	end,
 	['lua_ls'] = function()
@@ -115,6 +131,16 @@ require('mason-lspconfig').setup_handlers {
 					diagnostics = {
 						globals = { 'vim' }
 					}
+				}
+			}
+		}
+	end,
+	['gopls'] = function()
+		lspconfig.gopls.setup {
+			settings = {
+				gopls = {
+					completeUnimported = true,
+					usePlaceholders = true,
 				}
 			}
 		}
@@ -144,7 +170,7 @@ vim.wo.wrap = false
 vim.o.fillchars = vim.o.fillchars .. "eob: "
 
 vim.keymap.set('n', '<Leader>sf', builtin.find_files, {})
-vim.keymap.set('n', '<Leader>b', ':NvimTreeToggle<CR>')
+vim.keymap.set('n', '<Leader>b', ':Telescope file_browser<CR>')
 vim.keymap.set('n', '<Leader>f', function()
 	vim.lsp.buf.format { async = true }
 end)
