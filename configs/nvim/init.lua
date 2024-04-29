@@ -15,6 +15,10 @@ local plugins = {
 	-- colorschemes
 	--{ 'catppuccin/nvim' },
 	--{ 'ellisonleao/gruvbox.nvim' },
+	{
+		'mcchrish/zenbones.nvim',
+		dependencies = { "rktjmp/lush.nvim" }
+	},
 	{ 'EdenEast/nightfox.nvim' },
 	--{ 'rose-pine/neovim' },
 	--{ 'rebelot/kanagawa.nvim' },
@@ -49,7 +53,9 @@ local plugins = {
 			}
 		end,
 		dependencies = { { 'nvim-tree/nvim-web-devicons' } }
-	}
+	},
+	-- Git
+	{ 'lewis6991/gitsigns.nvim' }
 }
 
 local opts = {
@@ -89,6 +95,11 @@ require('mason-lspconfig').setup()
 require('autoclose').setup()
 
 local cmp = require('cmp')
+local icons = {
+	Text = "TXT",
+	Variable = "Var",
+	Snippet = "Snip"
+}
 
 cmp.setup {
 	snippet = {
@@ -112,6 +123,12 @@ cmp.setup {
 		{ name = 'luasnip' },
 		{ name = 'nvim_lsp_signature_help' },
 		{ name = 'buffer' }
+	},
+	formatting = {
+		format = function(_, vim_item)
+			-- vim_item.kind = icons[vim_item.kind] or ""
+			return vim_item
+		end
 	}
 }
 
@@ -158,16 +175,21 @@ require('nvim-treesitter.configs').setup {
 	},
 }
 
+require('gitsigns').setup()
+
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
+vim.opt.termguicolors = true
+vim.builtin = 0
 vim.g.mapleader = ' '
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
-vim.cmd.colorscheme 'carbonfox'
+vim.cmd.colorscheme 'zenbones'
 vim.wo.nu = true
 vim.wo.rnu = true
 vim.wo.wrap = false
 vim.o.fillchars = vim.o.fillchars .. "eob: "
+vim.o.cmdheight = 0
 
 vim.keymap.set('n', '<Leader>sf', builtin.find_files, {})
 vim.keymap.set('n', '<Leader>b', ':Telescope file_browser<CR>')
@@ -201,5 +223,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 		vim.keymap.set('n', '<space>f', function()
 			vim.lsp.buf.format { async = true }
 		end, opts)
+		vim.keymap.set('n', '<space>gl', vim.diagnostic.open_float, opts)
 	end,
 })
