@@ -32,5 +32,7 @@ vim.api.nvim_create_autocmd('lspattach', {
 			vim.lsp.buf.format { async = true }
 		end, opts)
 		vim.keymap.set('n', '<space>gl', vim.diagnostic.open_float, opts)
+		vim.keymap.set('n', '<space>gn', vim.diagnostic.goto_next, opts)
+		vim.keymap.set('n', '<space>gp', vim.diagnostic.goto_prev, opts)
 	end,
 })

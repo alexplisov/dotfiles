@@ -10,5 +10,8 @@ return {
         "Mofiqul/adwaita.nvim",
         lazy = false,
         priority = 1000,
-    }
+    },
+	{
+		"jaredgorski/Mies.vim"
+	}
 }
