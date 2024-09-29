@@ -2,6 +2,8 @@ local builtin = require('telescope.builtin')
 local nvim_tree = require('nvim-tree')
 
 vim.keymap.set('n', '<leader>sf', builtin.find_files, {})
+vim.keymap.set('n', '<leader>sr', ':Telescope live_grep<CR>', {})
+vim.keymap.set('n', '<leader>sk', builtin.keymaps, {})
 vim.keymap.set('n', '<leader>f', function()
 	vim.lsp.buf.format { async = true }
 end)
@@ -11,7 +13,6 @@ vim.keymap.set('n', '<leader>te', ':tabnew<CR>', {})
 vim.keymap.set('n', '<leader>tw', ':tabclose<CR>', {})
 vim.keymap.set('n', '<leader>tn', ':tabn<CR>', {})
 vim.keymap.set('n', '<leader>tp', ':tabp<CR>', {})
-
 vim.keymap.set('n', '<leader>b', ':NvimTreeToggle<CR>', {})
 
 vim.api.nvim_create_autocmd('lspattach', {
