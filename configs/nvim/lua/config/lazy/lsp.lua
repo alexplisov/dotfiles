@@ -13,11 +13,8 @@ return {
 		local lspconfig = require('lspconfig')
 		local mason_lspconfig = require('mason-lspconfig')
 		local capabilities = require('cmp_nvim_lsp').default_capabilities()
-		local icons = {
-			Text = "TXT",
-			Variable = "Var",
-			Snippet = "Snip"
-		}
+
+		require('neodev').setup()
 
 		require('mason').setup()
 		mason_lspconfig.setup()
@@ -27,18 +24,18 @@ return {
 					capabilities = capabilities,
 				}
 			end,
-			['lua_ls'] = function()
-				lspconfig.lua_ls.setup {
-					capabilities = capabilities,
-					settings = {
-						Lua = {
-							diagnostics = {
-								globals = { 'vim' }
-							}
-						}
-					}
-				}
-			end,
+			-- ['lua_ls'] = function()
+			-- 	lspconfig.lua_ls.setup {
+			-- 		capabilities = capabilities,
+			-- 		settings = {
+			-- 			Lua = {
+			-- 				diagnostics = {
+			-- 					globals = { 'vim' }
+			-- 				}
+			-- 			}
+			-- 		}
+			-- 	}
+			-- end,
 			['gopls'] = function()
 				lspconfig.gopls.setup {}
 			end

@@ -12,11 +12,8 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.termguicolors = true
 vim.opt.fillchars = vim.o.fillchars .. 'eob: '
-vim.opt.cmdheight = 0
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 
-vim.cmd.colorscheme 'nord'
+vim.cmd.colorscheme 'gruvbox'
 vim.cmd 'set nofoldenable'
-vim.cmd 'autocmd RecordingEnter * set cmdheight=1'
-vim.cmd 'autocmd RecordingLeave * set cmdheight=0'
