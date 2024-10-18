@@ -1,1 +1,9 @@
 add_newline = false
+format = "$os$all"
+
+[os]
+symbols = { Ubuntu = " ", Windows = " " }
+disabled = false
+
+[golang]
+symbol = "golang "
