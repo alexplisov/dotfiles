@@ -24,18 +24,6 @@ return {
 					capabilities = capabilities,
 				}
 			end,
-			-- ['lua_ls'] = function()
-			-- 	lspconfig.lua_ls.setup {
-			-- 		capabilities = capabilities,
-			-- 		settings = {
-			-- 			Lua = {
-			-- 				diagnostics = {
-			-- 					globals = { 'vim' }
-			-- 				}
-			-- 			}
-			-- 		}
-			-- 	}
-			-- end,
 			['gopls'] = function()
 				lspconfig.gopls.setup {}
 			end
@@ -64,12 +52,19 @@ return {
 				{ name = 'nvim_lsp_signature_help' },
 				{ name = 'buffer' }
 			},
-			formatting = {
-				format = function(_, vim_item)
-					-- vim_item.kind = icons[vim_item.kind] or ""
-					return vim_item
-				end
-			}
 		}
+
+		-- Format on save
+		vim.api.nvim_create_autocmd("LspAttach", {
+			group = vim.api.nvim_create_augroup("lsp", { clear = true }),
+			callback = function(args)
+				vim.api.nvim_create_autocmd("BufWritePre", {
+					buffer = args.buf,
+					callback = function()
+						vim.lsp.buf.format { async = false, id = args.data.client_id }
+					end,
+				})
+			end
+		})
 	end
 }

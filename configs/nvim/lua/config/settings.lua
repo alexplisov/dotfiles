@@ -15,5 +15,5 @@ vim.opt.fillchars = vim.o.fillchars .. 'eob: '
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 
-vim.cmd.colorscheme 'gruvbox'
+vim.cmd.colorscheme 'lunaperche'
 vim.cmd 'set nofoldenable'
