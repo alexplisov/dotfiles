@@ -1,9 +1,11 @@
 local builtin = require('telescope.builtin')
-local nvim_tree = require('nvim-tree')
 
+-- Searches
 vim.keymap.set('n', '<leader>sf', builtin.find_files, {})
 vim.keymap.set('n', '<leader>sr', ':Telescope live_grep<CR>', {})
 vim.keymap.set('n', '<leader>sk', builtin.keymaps, {})
+vim.keymap.set('n', '<leader>so', builtin.lsp_dynamic_workspace_symbols, {})
+
 vim.keymap.set('n', '<leader>f', function()
 	vim.lsp.buf.format { async = true }
 end)
