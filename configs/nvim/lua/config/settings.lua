@@ -14,6 +14,7 @@ vim.opt.termguicolors = true
 vim.opt.fillchars = vim.o.fillchars .. 'eob: '
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.o.laststatus = 1
 
 vim.cmd.colorscheme 'lunaperche'
 vim.cmd 'set nofoldenable'
