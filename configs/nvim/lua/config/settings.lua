@@ -10,7 +10,7 @@ vim.wo.wrap = false
 
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
-vim.opt.termguicolors = true
+-- vim.opt.termguicolors = true
 vim.opt.fillchars = vim.o.fillchars .. 'eob: '
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
